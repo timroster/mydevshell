@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sshhost
+  labels: 
+    app: devshell
+spec:
+  selector:
+    app: devshell
+  ports:
+  - protocol: TCP
+    port: 22
+    targetPort: 22

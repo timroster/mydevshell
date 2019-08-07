@@ -1,0 +1,556 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/scc: privileged
+    creationTimestamp: 2019-04-23T05:09:45Z
+    labels:
+      app: devshell
+    name: mydev
+    namespace: user002
+    resourceVersion: "671999"
+    selfLink: /api/v1/namespaces/user002/pods/mydev
+    uid: 02d35096-6586-11e9-99a0-00155d009608
+  spec:
+    containers:
+    - env:
+      - name: DOCKER_HOST
+        value: tcp://localhost:2375
+      - name: DEVUSER
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: dev-creds
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: dev-creds
+      image: timrodocker/devshell:v0.7
+      imagePullPolicy: IfNotPresent
+      name: mydev
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /home
+        name: docker-home-storage
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-j94l5
+        readOnly: true
+    - image: docker:dind
+      imagePullPolicy: IfNotPresent
+      name: dind-daemon
+      resources:
+        requests:
+          cpu: 50m
+          memory: 512Mi
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: docker-graph-storage
+      - mountPath: /home
+        name: docker-home-storage
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-j94l5
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-26z4g
+    initContainers:
+    - command:
+      - chmod
+      - "755"
+      - /home
+      image: alpine:3.6
+      imagePullPolicy: IfNotPresent
+      name: set-home-dir-perms
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /home
+        name: docker-home-storage
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-j94l5
+        readOnly: true
+    nodeName: localhost
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    volumes:
+    - name: docker-graph-storage
+      persistentVolumeClaim:
+        claimName: dockervol
+    - name: docker-home-storage
+      persistentVolumeClaim:
+        claimName: dockerhome
+    - name: default-token-j94l5
+      secret:
+        defaultMode: 420
+        secretName: default-token-j94l5
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T05:09:47Z
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T05:09:48Z
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: null
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T05:09:45Z
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://1f1d54e360a18f6a4be28b0b7923a87efbb17f886fa59062529388fa3d1c4547
+      image: docker.io/docker:dind
+      imageID: docker-pullable://docker.io/docker@sha256:075b82e21ff1b7fa8301288a5a3e730532a6fbee2c3f01d501fcd3bac37aff9d
+      lastState: {}
+      name: dind-daemon
+      ready: true
+      restartCount: 0
+      state:
+        running:
+          startedAt: 2019-04-23T05:09:48Z
+    - containerID: docker://383b2ceccd8f8c477fefea032cc0fd18c2faf2b5a74f58083f069fa22defb875
+      image: docker.io/timrodocker/devshell:v0.7
+      imageID: docker-pullable://docker.io/timrodocker/devshell@sha256:3b6ebf4623cf78956ba018d7a240cf093f503d2d030cb4ef66f2ada28d2f1179
+      lastState: {}
+      name: mydev
+      ready: true
+      restartCount: 0
+      state:
+        running:
+          startedAt: 2019-04-23T05:09:48Z
+    hostIP: 10.0.75.128
+    initContainerStatuses:
+    - containerID: docker://1b94926bc360de50b3afe2c55bcbf95c5099efdeba5a950aab32b087b469660b
+      image: docker.io/alpine:3.6
+      imageID: docker-pullable://docker.io/alpine@sha256:ee0c0e7b6b20b175f5ffb1bbd48b41d94891b0b1074f2721acb008aafdf25417
+      lastState: {}
+      name: set-home-dir-perms
+      ready: true
+      restartCount: 0
+      state:
+        terminated:
+          containerID: docker://1b94926bc360de50b3afe2c55bcbf95c5099efdeba5a950aab32b087b469660b
+          exitCode: 0
+          finishedAt: 2019-04-23T05:09:46Z
+          reason: Completed
+          startedAt: 2019-04-23T05:09:46Z
+    phase: Running
+    podIP: 172.17.0.13
+    qosClass: Burstable
+    startTime: 2019-04-23T05:09:45Z
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: wetty
+      openshift.io/deployment.name: wetty-1
+      openshift.io/generated-by: OpenShiftWebConsole
+      openshift.io/scc: anyuid
+    creationTimestamp: 2019-04-23T03:44:44Z
+    generateName: wetty-1-
+    labels:
+      app: wetty
+      deployment: wetty-1
+      deploymentconfig: wetty
+    name: wetty-1-xrztq
+    namespace: user002
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: wetty-1
+      uid: 21bacee5-657a-11e9-99a0-00155d009608
+    resourceVersion: "651405"
+    selfLink: /api/v1/namespaces/user002/pods/wetty-1-xrztq
+    uid: 22573760-657a-11e9-99a0-00155d009608
+  spec:
+    containers:
+    - env:
+      - name: SSHHOST
+        value: sshhost
+      image: timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+      imagePullPolicy: IfNotPresent
+      name: wetty
+      ports:
+      - containerPort: 3000
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - MKNOD
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-j94l5
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-26z4g
+    nodeName: localhost
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seLinuxOptions:
+        level: s0:c14,c9
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - name: default-token-j94l5
+      secret:
+        defaultMode: 420
+        secretName: default-token-j94l5
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T03:44:44Z
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T03:44:46Z
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: null
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: 2019-04-23T03:44:44Z
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://e5c0919f3e206943968f7d273cf76716f71917aea84d2836ab414e3255c42946
+      image: sha256:02363e3fcd4d28f8afd2b246f9f2100f6539a4adfbca328237cece1fa86d6fc5
+      imageID: docker-pullable://docker.io/timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+      lastState: {}
+      name: wetty
+      ready: true
+      restartCount: 0
+      state:
+        running:
+          startedAt: 2019-04-23T03:44:45Z
+    hostIP: 10.0.75.128
+    phase: Running
+    podIP: 172.17.0.15
+    qosClass: BestEffort
+    startTime: 2019-04-23T03:44:44Z
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.completed-at: 2019-04-23 03:44:46 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2019-04-23 03:44:43 +0000 UTC
+      openshift.io/deployer-pod.name: wetty-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: wetty
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"apps.openshift.io/v1","metadata":{"name":"wetty","namespace":"user002","selfLink":"/apis/apps.openshift.io/v1/namespaces/user002/deploymentconfigs/wetty","uid":"20f07af9-657a-11e9-9905-00155d009608","resourceVersion":"651363","generation":2,"creationTimestamp":"2019-04-23T03:44:42Z","labels":{"app":"wetty"},"annotations":{"openshift.io/generated-by":"OpenShiftWebConsole"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["wetty"],"from":{"kind":"ImageStreamTag","namespace":"user002","name":"wetty:v0.5"},"lastTriggeredImage":"timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304"}}],"replicas":1,"test":false,"selector":{"app":"wetty","deploymentconfig":"wetty"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"wetty","deploymentconfig":"wetty"},"annotations":{"openshift.io/generated-by":"OpenShiftWebConsole"}},"spec":{"containers":[{"name":"wetty","image":"timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304","ports":[{"containerPort":3000,"protocol":"TCP"}],"env":[{"name":"SSHHOST","value":"sshhost"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"IfNotPresent"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2019-04-23T03:44:42Z","lastTransitionTime":"2019-04-23T03:44:42Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: 2019-04-23T03:44:43Z
+    generation: 2
+    labels:
+      app: wetty
+      openshift.io/deployment-config.name: wetty
+    name: wetty-1
+    namespace: user002
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: wetty
+      uid: 20f07af9-657a-11e9-9905-00155d009608
+    resourceVersion: "651414"
+    selfLink: /api/v1/namespaces/user002/replicationcontrollers/wetty-1
+    uid: 21bacee5-657a-11e9-99a0-00155d009608
+  spec:
+    replicas: 1
+    selector:
+      app: wetty
+      deployment: wetty-1
+      deploymentconfig: wetty
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: wetty
+          openshift.io/deployment.name: wetty-1
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: wetty
+          deployment: wetty-1
+          deploymentconfig: wetty
+      spec:
+        containers:
+        - env:
+          - name: SSHHOST
+            value: sshhost
+          image: timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+          imagePullPolicy: IfNotPresent
+          name: wetty
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: 2019-04-23T03:43:07Z
+    labels:
+      app: devshell
+    name: sshhost
+    namespace: user002
+    resourceVersion: "650953"
+    selfLink: /api/v1/namespaces/user002/services/sshhost
+    uid: e81d03af-6579-11e9-99a0-00155d009608
+  spec:
+    clusterIP: 172.30.228.239
+    ports:
+    - port: 22
+      protocol: TCP
+      targetPort: 22
+    selector:
+      app: devshell
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: 2019-04-23T03:44:42Z
+    labels:
+      app: wetty
+    name: wetty
+    namespace: user002
+    resourceVersion: "651355"
+    selfLink: /api/v1/namespaces/user002/services/wetty
+    uid: 20f089ff-657a-11e9-99a0-00155d009608
+  spec:
+    clusterIP: 172.30.91.214
+    ports:
+    - name: 3000-tcp
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      deploymentconfig: wetty
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: 2019-04-23T03:44:42Z
+    generation: 2
+    labels:
+      app: wetty
+    name: wetty
+    namespace: user002
+    resourceVersion: "651416"
+    selfLink: /apis/apps.openshift.io/v1/namespaces/user002/deploymentconfigs/wetty
+    uid: 20f07af9-657a-11e9-9905-00155d009608
+  spec:
+    replicas: 1
+    selector:
+      app: wetty
+      deploymentconfig: wetty
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: wetty
+          deploymentconfig: wetty
+      spec:
+        containers:
+        - env:
+          - name: SSHHOST
+            value: sshhost
+          image: timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+          imagePullPolicy: IfNotPresent
+          name: wetty
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - wetty
+        from:
+          kind: ImageStreamTag
+          name: wetty:v0.5
+          namespace: user002
+        lastTriggeredImage: timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+      type: ImageChange
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: 2019-04-23T03:44:46Z
+      lastUpdateTime: 2019-04-23T03:44:46Z
+      message: Deployment config has minimum availability.
+      status: "True"
+      type: Available
+    - lastTransitionTime: 2019-04-23T03:44:47Z
+      lastUpdateTime: 2019-04-23T03:44:47Z
+      message: replication controller "wetty-1" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: "True"
+      type: Progressing
+    details:
+      causes:
+      - type: ConfigChange
+      message: config change
+    latestVersion: 1
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    unavailableReplicas: 0
+    updatedReplicas: 1
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/image.dockerRepositoryCheck: 2019-04-23T03:44:43Z
+    creationTimestamp: 2019-04-23T03:44:42Z
+    generation: 2
+    labels:
+      app: wetty
+    name: wetty
+    namespace: user002
+    resourceVersion: "651361"
+    selfLink: /apis/image.openshift.io/v1/namespaces/user002/imagestreams/wetty
+    uid: 20ef805c-657a-11e9-9905-00155d009608
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+        openshift.io/imported-from: timrodocker/wetty:v0.5
+      from:
+        kind: DockerImage
+        name: timrodocker/wetty:v0.5
+      generation: 2
+      importPolicy: {}
+      name: v0.5
+      referencePolicy:
+        type: Source
+  status:
+    dockerImageRepository: 172.30.1.1:5000/user002/wetty
+    tags:
+    - items:
+      - created: 2019-04-23T03:44:43Z
+        dockerImageReference: timrodocker/wetty@sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+        generation: 2
+        image: sha256:74aeedab3fda7a63fdae5c50c1faeddb94ee727b1ce30718c82c36aa9c899304
+      tag: v0.5
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/host.generated: "true"
+    creationTimestamp: 2019-04-23T03:45:43Z
+    labels:
+      app: wetty
+    name: wetty
+    namespace: user002
+    resourceVersion: "651644"
+    selfLink: /apis/route.openshift.io/v1/namespaces/user002/routes/wetty
+    uid: 4507d182-657a-11e9-9905-00155d009608
+  spec:
+    host: wetty-user002.10.0.75.128.nip.io
+    port:
+      targetPort: 3000-tcp
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: wetty
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2019-04-23T03:45:43Z
+        status: "True"
+        type: Admitted
+      host: wetty-user002.10.0.75.128.nip.io
+      routerName: router
+      wildcardPolicy: None
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
